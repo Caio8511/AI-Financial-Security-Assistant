@@ -1,26 +1,41 @@
-print("===================================")
-print(" AI Financial Security Assistant ")
-print("===================================")
+import streamlit as st
+from services.security_service import analyze_security
+from utils.logger import save_log
 
-print("\nWelcome to the AI Financial Security Assistant.\n")
+# Configuração da página
+st.set_page_config(page_title="AI Financial Security Assistant", page_icon="🔐", layout="centered")
 
-question = input("Ask something about financial security: ")
+# Título principal
+st.title("🔐 AI Financial Security Assistant")
 
-responses = {
-    "fraud": "Warning: Monitor suspicious transactions and unknown activities.",
-    "phishing": "Never click on suspicious emails or fake banking links.",
-    "mfa": "Enable Multi-Factor Authentication to improve account security.",
-    "password": "Use strong passwords with numbers and symbols."
-}
+# Descrição
+st.markdown(
+    """Assistente inteligente focado em:
 
-found = False
+- Segurança Financeira
+- Inteligência Artificial
+- Detecção de Golpes
+- Automação
+- Análise de Risco
+"""
+)
 
-for keyword in responses:
-    if keyword in question.lower():
-        print("\nAI Response:")
-        print(responses[keyword])
-        found = True
+# Campo de entrada
+user_input = st.text_area(
+    "Digite uma dúvida ou situação suspeita:",
+    placeholder="Ex: Recebi um SMS do banco pedindo minha senha...",
+)
 
-if not found:
-    print("\nAI Response:")
-    print("Security recommendation generated successfully.")
+
+if st.button("Analisar"):
+    if user_input:
+        level, message = analyze_security(user_input)
+        save_log(level, user_input)
+        if level == "error":
+            st.error(message)
+        elif level == "warning":
+            st.warning(message)
+        else:
+            st.success(message)
+    else:
+        st.info("Digite alguma informação para análise.")
